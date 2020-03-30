@@ -1,6 +1,10 @@
 #ifndef LIST
 #define LIST
 
+#ifndef ERROR
+#include "errorMessage.c"
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -47,9 +51,5 @@ int top(list *);
 int searchList(list *, int);
 
 int getLast(list *);
-
-void errorMessageMem(char *);
-void errorMessageIllegalSize(char *);
-void errorMessageListSize(char *);
 
 #endif
