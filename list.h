@@ -1,55 +1,73 @@
 #ifndef LIST
 #define LIST
 
-#ifndef ERROR
-#include "errorMessage.c"
-#endif
-
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 
-typedef struct lnode
+typedef struct Qnode
 {
-  int value;
+  void *elem;
 
-  struct lnode *prev, *next;
-  
-}lnode;
+  struct Qnode *prev, *next;
 
-typedef struct
+}Qnode;
+
+typedef struct List
 {
   int size;
 
-  struct lnode *first, *last;
-  
-}list;
+  Qnode *head, *tail;
 
+}List;
 
-list *newList();
+/* Allocates memory for a list and return a pointer.
+   On fail return NULL*/
+List* allocList();
 
-lnode *newNode(int);
+/* Allocates new momory for a Qnode and return its pointer,
+   On fail return NULL*/
+Qnode* allocQnode(void *elem);
 
-void insertFirst(list *, int);
-void push(list *, int);
+/* Return the pointer of type Qnode for the first Qnode
+   in the list. On fail return NULL*/
+Qnode* topQnode(List *list);
 
-void insertLast(list *, int);
-void enqueue(list *, int);
+/* Returns the pointer for the first element of the list.
+   On fail return NULL*/
+void* top(List *list);
 
-int removeFirst(list *);
-int pop(list *);
-int dequeue(list *);
+/* Return the list size*/
+int listIsEmpty(List *list);
 
-int removeLast(list *);
+/* Add (*elem) to the beginig of the list. This function
+   return the pointer (*elem) on success, otherwise
+   NULL is returned.*/
+void* push(List *list, void *elem);
 
-void removeValue(list *, int);
+/* Add (*elem) to the end of the list. This function
+   return the pointer (*elem) on success, otherwise
+   NULL is returned.*/
+void* enqueue(List *list, void *elem);
 
-int listSize(list *);
-int isEmpty(list *);
+/* Removes the first element of the list and returns its
+   pointer. On fail dequeue return NULL*/
+void* dequeue(List *list);
 
-int getFirst(list *);
-int top(list *);
-int searchList(list *, int);
+/* Removes the first element of the list and returns its
+   pointer. On fail dequeue return NULL*/
+void* pop(List *list);
 
-int getLast(list *);
+/* Print all the elements of the list. This function takes two
+   arguments, (List *list) which is a pointer to the list and
+   (void (*print)(const void *elem) which is a pointer to the
+   function that prints an element saved by Qnode.*/
+void printList(List *list, void (*print)(const void *elem));
+
+/* This function frees all the memory allocated in *list.
+   This function takes two arguments (List *list)
+   which is a pointer to the list and (void (*print)(void *elem))
+   which is a pointer to the function that frees an element
+   (void *elem) save by each Qnode*/
+void freeList(List *list, void (*freeElem)(void *elem));
 
 #endif

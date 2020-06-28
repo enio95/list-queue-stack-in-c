@@ -1,187 +1,146 @@
 #include "list.h"
-#define INVALID 2147483648
 
-
-list *newList()
+List* allocList()
 {
-  list *l = (list*)malloc(sizeof(list));
+  List *list = (List*)calloc(1, sizeof(List));
 
-  if ( l==NULL )
-    errorMessageMem("initiateList");
+  if ( list == NULL )
+    perror("allocList");
 
-  l->size = 0;
-  
-  l->first = newNode(INVALID);
-  l->last = newNode(INVALID);
-  
-  l->first->next = l->last;
-  l->first->prev = NULL;
-  
-  l->last->prev = l->first;
-  l->last->next = NULL;
-  
-  return l;
+  list->size = 0;
+
+  list->head = allocQnode(NULL);
+  list->tail = allocQnode(NULL);
+
+  list->head->next = list->tail;
+  list->tail->prev = list->head;
+
+  return list;
 }
 
-lnode *newNode(int a)
+Qnode* allocQnode(void *elem)
 {
-  lnode *n = (lnode*)malloc(sizeof(lnode));
+  Qnode *node = (Qnode*)calloc(1, sizeof(Qnode));
 
-  if ( n==NULL )
-    errorMessageMem("newNode");
-  
-  n->prev = NULL;
-  n->next = NULL;
+  if ( node == NULL )
+    perror("allocQnode");
 
-  n->value =  a;
+  node->elem = elem;
 
-  return n;
+  return node;
 }
 
-void insertFirst(list *l, int n)
+Qnode* topQnode(List *list)
 {
-  lnode *temp = newNode(n);
-  
-  temp->prev = l->first;
-  temp->next = l->first->next;
+  if ( !list->size )
+    return NULL;
 
-  l->first->next->prev = temp;
-  l->first->next = temp;
-
-  l->size++;
+  return list->head->next;
 }
 
-void push(list *l, int n) { insertFirst(l, n); }
-
-
-void insertLast(list *l, int n)
+void* top(List *list)
 {
-  lnode *temp = newNode(n);
-  
-  temp->next = l->last;
-  temp->prev = l->last->prev;
+  Qnode *node = topQnode(list);
 
-  l->last->prev->next = temp;
-  l->last->prev = temp;
-
-  l->size++;
+  return node == NULL ? NULL: node->elem;
 }
 
-void enqueue(list *l, int n) { insertLast(l, n); }
-
-
-int removeFirst(list *l)
+int listIsEmpty(List *list)
 {
-  if ( !l->size )
-    return INVALID;
-
-  lnode *temp = l->first->next;
-
-  if ( temp==l->last )
-    errorMessageMem("removeFirst");
-  
-  temp->next->prev = l->first;
-  l->first->next = temp->next;
-
-  l->size--;
-
-  return temp->value;
+  return list == NULL ? 0: list->size > 0;
 }
 
-int pop(list *l) { return removeFirst(l); }
-
-int dequeue(list *l) { return removeFirst(l); }
-
-
-int removeLast(list *l)
+void* push(List *list, void *elem)
 {
-  if ( !l->size )
-    return INVALID;
+  if ( list == NULL )
+    return NULL;
 
-  lnode *temp = l->last->prev;
+  Qnode *node = allocQnode(elem);
 
-  if ( temp==l->first )
-    errorMessageMem("removeLast");
-  
-  temp->prev->next = l->last;
-  l->last->prev = temp->prev;
+  if ( node == NULL )
+    return NULL;
 
-  l->size--;
+  node->next = list->head->next;
+  node->prev = list->head;
 
-  return temp->value;
+  list->head->next->prev = node;
+  list->head->next = node;
+
+  list->size++;
+
+  return elem;
 }
 
-void removeValue(list *l, int v)
+void* enqueue(List *list, void *elem)
 {
-  lnode *cur;
-  
-  for( cur = l->first->next; cur!=l->last && cur->value!=v; cur = cur->next );
+  if ( list == NULL )
+    return NULL;
 
-  if ( cur==l->last )
+  Qnode *node = allocQnode(elem);
+
+  if ( node == NULL )
+    return NULL;
+
+  node->next = list->tail;
+  node->prev = list->tail->prev;
+
+  list->tail->prev->next = node;
+  list->tail->prev = node;
+
+  list->size++;
+
+  return elem;
+}
+
+void* dequeue(List *list)
+{
+  if ( list == NULL || list->size == 0 )
+    return NULL;
+
+  void *elem = top(list);
+  Qnode *first = topQnode(list);
+
+  list->head->next = first->next;
+  first->next->prev = list->head;
+
+  list->size--;
+
+  free(first);
+
+  return elem;
+}
+
+void* pop(List *list) { return dequeue(list); }
+
+void printList(List *list, void (*print)(const void *elem))
+{
+  if ( list == NULL )
     return;
 
-  cur->next->prev = cur->prev;
-  cur->prev->next = cur->next;
+  printf("Start List Print. Size = %d\n", list->size);
 
-  l->size--;
-}
+  int i = 0;
 
-int listSize(list *l)
-{
-  if ( l->size<0 )
-    errorMessageIllegalSize("listSize");
-  
-  return l->size;
-};
-
-int isEmpty(list *l ) { return l->size ? 0: 1; }
-
-
-int getFirst(list *l)
-{
-  if ( isEmpty(l) )
-    return INVALID;
-
-  return l->first->next->value;
-}
-
-int top(list *l) { return getFirst(l); }
-
-
-int getLast(list *l)
-{
-  if ( isEmpty(l) )
-    return INVALID;
-
-  return l->last->prev->value;
-}
-
-int searchList(list *l, int v)
-{
-  for( lnode *cur = l->first->next; cur!=l->last; cur = cur->next )
-    if ( cur->value == v )
-      return 1;
-
-  return 0;
-}
-
-void printList(list *l)
-{
-  printf("List size = %d\n", l->size);
-
-  printf("Its Members are\n");
-
-  if ( isEmpty(l) )
-    printf("None\n");
-
-  else
+  for( Qnode *cur = list->head->next; cur != list->tail; cur = cur->next )
     {
-      int i=0;
-      
-      for( lnode *cur = l->first->next; cur!=l->last; cur = cur->next )
-	{
-	  printf("Index = %d\n", i++);
-	  printf("Value = %d\n", cur->value);
-	}
+      printf("Index = %d\n", i++);
+
+      print(cur->elem);
     }
+
+  printf("End List Print\n");
+}
+
+void freeList(List *list, void (*freeElem)(void *elem))
+{
+  if ( list == NULL )
+    return;
+
+  while ( list->size )
+    freeElem(dequeue(list));
+
+  free(list->head);
+  free(list->tail);
+
+  free(list);
 }
