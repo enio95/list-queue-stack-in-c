@@ -117,7 +117,7 @@ void printList(List *list, void (*print)(const void *elem))
   if ( list == NULL )
     return;
 
-  printf("Start List Print. Size = %d\n", list->size);
+  printf("Start of List Print. Size = %d\n", list->size);
 
   int i = 0;
 
@@ -128,7 +128,7 @@ void printList(List *list, void (*print)(const void *elem))
       print(cur->elem);
     }
 
-  printf("End List Print\n");
+  printf("End of List Print\n");
 }
 
 void freeList(List *list, void (*freeElem)(void *elem))

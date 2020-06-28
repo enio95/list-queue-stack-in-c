@@ -4,6 +4,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+/* prev -> pointer to the previous Qnode
+   next -> pointer to the next Qnode
+   elm -> pointer to a piece of memory defined by the user*/
 typedef struct Qnode
 {
   void *elem;
@@ -12,6 +15,10 @@ typedef struct Qnode
 
 }Qnode;
 
+/* size -> size of the list
+   head and tail should not be used to get the first element
+   because they do NOT hold read values, but are there
+   for an easier insertion and remove*/
 typedef struct List
 {
   int size;
