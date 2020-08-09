@@ -1,5 +1,18 @@
 #include "list.h"
 
+/*================LOCAL FUNCTIONS DECLARATION================*/
+/* Allocates new memory for a Qnode and returns its pointer,
+   On fail returns NULL*/
+static Qnode* allocQnode(void *elem);
+/* END: */
+
+/* Return the pointer of type Qnode for the first Qnode
+   in the list. On fail return NULL*/
+static Qnode* topQnode(List *list);
+/* END: */
+
+
+/*================IMPLEMENTATION================*/
 List* allocList()
 {
   List *list = (List*)calloc(1, sizeof(List));
@@ -18,7 +31,7 @@ List* allocList()
   return list;
 }
 
-Qnode* allocQnode(void *elem)
+static Qnode* allocQnode(void *elem)
 {
   Qnode *node = (Qnode*)calloc(1, sizeof(Qnode));
 
@@ -30,7 +43,7 @@ Qnode* allocQnode(void *elem)
   return node;
 }
 
-Qnode* topQnode(List *list)
+static Qnode* topQnode(List *list)
 {
   if ( !list->size )
     return NULL;
